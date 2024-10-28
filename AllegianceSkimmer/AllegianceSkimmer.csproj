@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <OutputPath>..\bin\</OutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+    <Version>1.0.0</Version>
+    <LangVersion>12</LangVersion>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+    <ProjectGuid>1cdb3f80-dd13-4f81-bbd7-9b3344f64598</ProjectGuid>
+    <RootNamespace>AllegianceSkimmer</RootNamespace>
+    <AssemblyName>AllegianceSkimmer</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="PluginCore.cs" />
+    <None Include="ExampleUI.cs" />
+    <Content Include="scripts\installer.nsi" />
+    <Content Include="scripts\post-build.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Decal.Adapter">
+      <HintPath>.\..\deps\Decal.Adapter.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NSIS-Tool" Version="3.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="UtilityBelt.Service" Version="2.2.6">
+      <ExcludeAssets>runtime; build;</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="powershell -ExecutionPolicy RemoteSigned -NoProfile &quot;$(ProjectDir)scripts\post-build.ps1&quot; -NuGetPackageRoot &quot;$(NuGetPackageRoot)&quot; -ProjectDir &quot;$(ProjectDir)&quot;" />
+  </Target>
+</Project>

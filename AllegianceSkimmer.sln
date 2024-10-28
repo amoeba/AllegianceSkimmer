@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllegianceSkimmer.Loader", "AllegianceSkimmer.Loader\AllegianceSkimmer.Loader.csproj", "{5B7FBFF3-F616-4F39-A64A-FAAB70D5057F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllegianceSkimmer", "AllegianceSkimmer\AllegianceSkimmer.csproj", "{1CDB3F80-DD13-4F81-BBD7-9B3344F64598}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B7FBFF3-F616-4F39-A64A-FAAB70D5057F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B7FBFF3-F616-4F39-A64A-FAAB70D5057F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B7FBFF3-F616-4F39-A64A-FAAB70D5057F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B7FBFF3-F616-4F39-A64A-FAAB70D5057F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CDB3F80-DD13-4F81-BBD7-9B3344F64598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CDB3F80-DD13-4F81-BBD7-9B3344F64598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CDB3F80-DD13-4F81-BBD7-9B3344F64598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CDB3F80-DD13-4F81-BBD7-9B3344F64598}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F75E6ADD-44DD-4D0A-B164-AD1B76D9B424}
+	EndGlobalSection
+EndGlobal
