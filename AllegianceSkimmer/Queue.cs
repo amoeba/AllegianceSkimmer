@@ -44,12 +44,12 @@ namespace AllegianceSkimmer
             {
                 InvokeChatTask chatTask = (InvokeChatTask)task;
 
-                PluginCore.Message("Invoking Task of InvokeChat type");
+                Utilities.Message("Invoking Task of InvokeChat type");
                 PluginCore.Game().Actions.InvokeChat(chatTask.Message);
             }
             else
             {
-                PluginCore.Message("On OnTick, found Not implemented task type.");
+                Utilities.Message("On OnTick, found Not implemented task type.");
 
                 return;
             }
@@ -57,7 +57,7 @@ namespace AllegianceSkimmer
 
         public void Enqueue(Task task)
         {
-            PluginCore.Message("Enqueing task...");
+            Utilities.Message("Enqueing task...");
             tasks.Push(task);
         }
 

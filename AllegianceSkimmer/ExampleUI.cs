@@ -10,20 +10,9 @@ namespace AllegianceSkimmer
 {
     internal class ExampleUI : IDisposable
     {
-        /// <summary>
-        /// The UBService Hud
-        /// </summary>
+
         private readonly Hud hud;
-
-        /// <summary>
-        /// The default value for TestText.
-        /// </summary>
-        public const string DefaultTestText = "Some Test Text";
-
-        /// <summary>
-        /// Some test text. This value is used to the text input in our UI.
-        /// </summary>
-        public string TestText = DefaultTestText.ToString();
+        public string ExportPath = "scanresult.json";
 
         public ExampleUI()
         {
@@ -32,6 +21,9 @@ namespace AllegianceSkimmer
 
             // set to show our icon in the UBService HudBar
             hud.ShowInBar = true;
+
+            // Temporary
+            hud.Visible = true;
 
             // subscribe to the hud render event so we can draw some controls
             hud.OnRender += Hud_OnRender;
@@ -45,94 +37,119 @@ namespace AllegianceSkimmer
         {
             try
             {
-                ImGui.ShowDemoWindow();
+                //ImGui.ShowDemoWindow();
 
-                ImGui.SeparatorText("Conrols");
-
-                if (ImGui.Button("Start Scan"))
+                if (ImGui.BeginTabBar("tabs"))
                 {
-                    OnStartScanButtonPress();
-                }
-
-                ImGui.SameLine();
-
-                if (ImGui.Button("Stop Scan"))
-                {
-                    OnStopScanButtonPress();
-                }
-
-                ImGui.SeparatorText("Progress");
-
-                var progressBarSizeVec = new Vector2(-1, (int)ImGui.GetFontSize() * 2);
-                if (PluginCore.currentScan != null)
-                {
-                    int n = PluginCore.currentScan.characters.FindAll(c => c.Resolved).Count;
-                    int N = PluginCore.currentScan.characters.Count;
-                    string text = $"{n}/{N} Items Processed. Fraction is {(float)n / N}";
-                    ImGui.ProgressBar((float)n / N, progressBarSizeVec, text);
-                } 
-                else
-                {
-                    ImGui.ProgressBar(0, progressBarSizeVec, "Scan not started.");
-                }
-
-                ImGui.SeparatorText("Table");
-
-                if (ImGui.BeginTable("table1", 2, ImGuiTableFlags.ScrollY))
-                {
-                    ImGui.TableSetupScrollFreeze(0, 1); // Make top row always visible
-                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.None);
-                    ImGui.TableSetupColumn("Scanned", ImGuiTableColumnFlags.None);
-                    ImGui.TableHeadersRow();
-
-                    if (PluginCore.currentScan != null)
+                    if (ImGui.BeginTabItem("Scan"))
                     {
-                        for (int i = 0; i < PluginCore.currentScan.characters.Count; i++)
+                        if (ImGui.Button("Start Scan"))
                         {
-                            ImGui.TableNextRow();
-
-
-                            
-                            ImGui.TableSetColumnIndex(0);
-                            ImGui.Text(PluginCore.currentScan.characters[i].Name);
-                            ImGui.TableSetColumnIndex(1);
-                            if (PluginCore.currentScan.characters[i].Resolved)
-                            {
-                                ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.Vec4ToCol(new Vector4(0, (float)0.8, 0, (float)0.5)));
-                                ImGui.Text("Scanned");
-
-                            } else
-                            {
-                                ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.Vec4ToCol(new Vector4((float)0.8, (float)0.8, 0, (float)0.5)));
-                                ImGui.Text("Queued");
-                            }
+                            OnStartScanButtonPress();
                         }
 
-                    }
-                    ImGui.EndTable();
-                }
+                        ImGui.SameLine();
 
-                ImGui.SeparatorText("Tree");
-                
-                if (ImGui.TreeNode("Tree"))
-                {
-                    ImGui.Text("Treeeee");
-                    ImGui.TreePush("Treeeee");
-                    ImGui.TreePush("Treeeeeeeee");
-                    ImGui.TreePop();
-                    ImGui.TreePop();
-                    ImGui.TreePop();
+                        if (ImGui.Button("Stop Scan"))
+                        {
+                            OnStopScanButtonPress();
+                        }
+
+                        var progressBarSizeVec = new Vector2(-1, (int)ImGui.GetFontSize() * 2);
+                        if (PluginCore.currentScan != null)
+                        {
+                            int n = PluginCore.currentScan.characters.FindAll(c => c.Resolved).Count;
+                            int N = PluginCore.currentScan.characters.Count;
+                            string text = $"{n}/{N} Items Processed. Fraction is {(float)n / N}";
+                            ImGui.ProgressBar((float)n / N, progressBarSizeVec, text);
+                        }
+                        else
+                        {
+                            ImGui.ProgressBar(0, progressBarSizeVec, "Scan not started.");
+                        }
+
+                        ImGui.EndTabItem();
+                    }
+
+                    if (ImGui.BeginTabItem("Result"))
+                    {
+                        if (ImGui.BeginTable("table1", 2, ImGuiTableFlags.ScrollY))
+                        {
+                            ImGui.TableSetupScrollFreeze(0, 1); // Make top row always visible
+                            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.None);
+                            ImGui.TableSetupColumn("Scanned", ImGuiTableColumnFlags.None);
+                            ImGui.TableHeadersRow();
+
+                            if (PluginCore.currentScan != null)
+                            {
+                                for (int i = 0; i < PluginCore.currentScan.characters.Count; i++)
+                                {
+                                    ImGui.TableNextRow();
+
+
+
+                                    ImGui.TableSetColumnIndex(0);
+                                    ImGui.Text(PluginCore.currentScan.characters[i].Name);
+                                    ImGui.TableSetColumnIndex(1);
+                                    if (PluginCore.currentScan.characters[i].Resolved)
+                                    {
+                                        ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.Vec4ToCol(new Vector4(0, (float)0.8, 0, (float)0.5)));
+                                        ImGui.Text("Scanned");
+
+                                    }
+                                    else
+                                    {
+                                        ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.Vec4ToCol(new Vector4((float)0.8, (float)0.8, 0, (float)0.5)));
+                                        ImGui.Text("Queued");
+                                    }
+                                }
+
+                            }
+                            ImGui.EndTable();
+                        }
+
+                        ImGui.EndTabItem();
+                    }
+
+                    if (ImGui.BeginTabItem("Tree"))
+                    {
+                        if (ImGui.TreeNode("Tree"))
+                        {
+                            ImGui.Text("Treeeee");
+                            ImGui.TreePush("Treeeee");
+                            ImGui.TreePush("Treeeeeeeee");
+                            ImGui.TreePop();
+                            ImGui.TreePop();
+                            ImGui.TreePop();
+                        }
+
+                        ImGui.EndTabItem();
+                    }
+                    if (ImGui.BeginTabItem("Export"))
+                    {
+                        ImGui.InputText("Path", ref ExportPath, 64);
+
+                        if (ImGui.Button("Save"))
+                        {
+                            OnExportSaveButtonClicked();
+                        }
+                        ImGui.EndTabItem();
+                    }
+
+                    ImGui.EndTabBar();
                 }
             }
             catch (Exception ex)
             {
-                PluginCore.Log(ex);
+                Logging.Log(ex);
             }
         }
 
-        /// <summary>
-        /// Called when our print test text button is pressed
-        /// </summary>
+        public void Dispose()
+        {
+            hud.Dispose();
+        }
+
         private void OnStartScanButtonPress()
         {
             var textToShow = $"Start Scan Pressed";
@@ -153,10 +170,6 @@ namespace AllegianceSkimmer
             PluginCore.StopScan();
         }
 
-
-        /// <summary>
-        /// Called when our print test text button is pressed
-        /// </summary>
         private void OnNextButtonPressed()
         {
             var textToShow = $"Next Scan Pressed";
@@ -167,9 +180,10 @@ namespace AllegianceSkimmer
             PluginCore.IterateScan();
         }
 
-        public void Dispose()
+        private void OnExportSaveButtonClicked()
         {
-            hud.Dispose();
+            Utilities.Message("OnExportSaveButtonClicked");
+            Export.DoExport(ExportPath);
         }
     }
 }

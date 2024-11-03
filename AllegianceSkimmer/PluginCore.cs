@@ -19,7 +19,6 @@ namespace AllegianceSkimmer
     [FriendlyName("AllegianceSkimmer")]
     public class PluginCore : PluginBase
     {
-        private static string _assemblyDirectory = null;
         private ExampleUI ui;
         private static Game _game;
         public static Scan currentScan;
@@ -29,28 +28,7 @@ namespace AllegianceSkimmer
         /// <summary>
         /// Assembly directory containing the plugin dll
         /// </summary>
-        public static string AssemblyDirectory
-        {
-            get
-            {
-                if (_assemblyDirectory == null)
-                {
-                    try
-                    {
-                        _assemblyDirectory = System.IO.Path.GetDirectoryName(typeof(PluginCore).Assembly.Location);
-                    }
-                    catch
-                    {
-                        _assemblyDirectory = Environment.CurrentDirectory;
-                    }
-                }
-                return _assemblyDirectory;
-            }
-            set
-            {
-                _assemblyDirectory = value;
-            }
-        }
+
 
         /// <summary>
         /// Called when your plugin is first loaded.
@@ -81,10 +59,12 @@ namespace AllegianceSkimmer
 
                 // Queue
                 globalQueue = new Queue();
+
+                Globals.Init("AllegianceSkimmer");
             }
             catch (Exception ex)
             {
-                Log(ex);
+                Logging.Log(ex);
             }
         }
 
@@ -95,8 +75,7 @@ namespace AllegianceSkimmer
         {
             try
             {
-
-
+                Globals.Destroy();
                 // make sure to unsubscribe from any events we were subscribed to. Not doing so
                 // can cause the old plugin to stay loaded between hot reloads.
                 CoreManager.Current.CharacterFilter.LoginComplete -= CharacterFilter_LoginComplete;
@@ -118,13 +97,13 @@ namespace AllegianceSkimmer
             }
             catch (Exception ex)
             {
-                Log(ex);
+                Logging.Log(ex);
             }
         }
 
         protected void FilterSetup(string assemblyDirectory)
         {
-            AssemblyDirectory = assemblyDirectory;
+            Utilities.AssemblyDirectory = assemblyDirectory;
         }
 
         /// <summary>
@@ -140,7 +119,7 @@ namespace AllegianceSkimmer
             }
             catch (Exception ex)
             {
-                Log(ex);
+                Logging.Log(ex);
             }
         }
 
@@ -153,15 +132,15 @@ namespace AllegianceSkimmer
         {
             if (!_game.Character.Allegiance.Exists)
             {
-                Message("This character isn't in an allegiance. Not starting scan.");
+                Utilities.Message("This character isn't in an allegiance. Not starting scan.");
                 return;
             }
 
             uint monarch_id = _game.Character.Allegiance.Monarch.Id;
             string monarch_name = _game.Character.Allegiance.Monarch.Name;
 
-            Message($"Starting scan for allegiance with monarch {monarch_id:X2} {monarch_name}.");
-            currentScan = new Scan(new ScanItem(monarch_id, monarch_name));
+            Utilities.Message($"Starting scan for allegiance with monarch {monarch_id:X2} {monarch_name}.");
+            currentScan = new Scan(new ScanItem(monarch_id, monarch_name, /*is_root*/true));
             currentScan.Begin();
         }
 
@@ -184,7 +163,7 @@ namespace AllegianceSkimmer
         {
             if (currentScan == null)
             {
-                Message("No active scan. Done.");
+                Utilities.Message("No active scan. Done.");
                 return;
             }
 
@@ -199,7 +178,7 @@ namespace AllegianceSkimmer
             // If there's no current scan, ignore
             if (currentScan == null)
             {
-                Message("Not handling AllegianceInfoResponseEvent because we're not currently scanning");
+                Utilities.Message("Not handling AllegianceInfoResponseEvent because we're not currently scanning");
                 return;
             }
 
@@ -216,36 +195,5 @@ namespace AllegianceSkimmer
 
             globalQueue.OnTick();
         }
-
-        #region logging
-        /// <summary>
-        /// Log an exception to log.txt in the same directory as the plugin.
-        /// </summary>
-        /// <param name="ex"></param>
-        internal static void Log(Exception ex)
-        {
-            Log(ex.ToString());
-        }
-
-        /// <summary>
-        /// Log a string to log.txt in the same directory as the plugin.
-        /// </summary>
-        /// <param name="message"></param>
-        internal static void Log(string message)
-        {
-            try
-            {
-                File.AppendAllText(System.IO.Path.Combine(AssemblyDirectory, "log.txt"), $"{message}\n");
-
-                CoreManager.Current.Actions.AddChatText(message, 1);
-            }
-            catch { }
-        }
-
-        public static void Message(string message)
-        {
-            CoreManager.Current.Actions.AddChatText($"{message}", 1);
-        }
-        #endregion // logging
     }
 }
