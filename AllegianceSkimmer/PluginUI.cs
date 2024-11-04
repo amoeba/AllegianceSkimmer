@@ -1,56 +1,41 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Numerics;
-using Decal.Adapter;
+
 using ImGuiNET;
 using UtilityBelt.Service;
 using UtilityBelt.Service.Views;
 
 namespace AllegianceSkimmer
 {
-    internal class ExampleUI : IDisposable
+    internal class PluginUI : IDisposable
     {
 
         private readonly Hud hud;
         public string ExportPath = "scanresult.json";
 
-        public ExampleUI()
+        public PluginUI()
         {
-            // Create a new UBService Hud
-            hud = UBService.Huds.CreateHud("AllegianceSkimmer");
-
-            // set to show our icon in the UBService HudBar
+            hud = UBService.Huds.CreateHud("Allegiance Skimmer");
             hud.ShowInBar = true;
-
             // Temporary
             hud.Visible = true;
-
-            // subscribe to the hud render event so we can draw some controls
             hud.OnRender += Hud_OnRender;
-
         }
 
-        /// <summary>
-        /// Called every time the ui is redrawing.
-        /// </summary>
         private void Hud_OnRender(object sender, EventArgs e)
         {
             try
             {
-                //ImGui.ShowDemoWindow();
-
                 if (ImGui.BeginTabBar("tabs"))
                 {
                     if (ImGui.BeginTabItem("Scan"))
                     {
-                        if (ImGui.Button("Start Scan"))
+                        if (ImGui.Button("Start Scan", new Vector2(-1, 64)))
                         {
                             OnStartScanButtonPress();
                         }
 
-                        ImGui.SameLine();
-
-                        if (ImGui.Button("Stop Scan"))
+                        if (ImGui.Button("Stop Scan", new Vector2(-1, 32)))
                         {
                             OnStopScanButtonPress();
                         }
@@ -58,14 +43,13 @@ namespace AllegianceSkimmer
                         var progressBarSizeVec = new Vector2(-1, (int)ImGui.GetFontSize() * 2);
                         if (PluginCore.currentScan != null)
                         {
-                            int n = PluginCore.currentScan.characters.FindAll(c => c.Resolved).Count;
-                            int N = PluginCore.currentScan.characters.Count;
-                            string text = $"{n}/{N} Items Processed. Fraction is {(float)n / N}";
-                            ImGui.ProgressBar((float)n / N, progressBarSizeVec, text);
-                        }
-                        else
-                        {
-                            ImGui.ProgressBar(0, progressBarSizeVec, "Scan not started.");
+                            uint n = (uint)PluginCore.currentScan.characters.FindAll(c => c.Resolved).Count;
+                            uint N = PluginCore.currentScan.ExpectedSize;
+                            float progress = (float)n / (float)N;
+                            string text = $"{n}/{N} characters processed.";
+
+                            ImGui.ProgressBar(progress, progressBarSizeVec);
+                            ImGui.Text(text);
                         }
 
                         ImGui.EndTabItem();
@@ -85,9 +69,6 @@ namespace AllegianceSkimmer
                                 for (int i = 0; i < PluginCore.currentScan.characters.Count; i++)
                                 {
                                     ImGui.TableNextRow();
-
-
-
                                     ImGui.TableSetColumnIndex(0);
                                     ImGui.Text(PluginCore.currentScan.characters[i].Name);
                                     ImGui.TableSetColumnIndex(1);
@@ -152,37 +133,21 @@ namespace AllegianceSkimmer
 
         private void OnStartScanButtonPress()
         {
-            var textToShow = $"Start Scan Pressed";
-
-            CoreManager.Current.Actions.AddChatText(textToShow, 1);
-            UBService.Huds.Toaster.Add(textToShow, ToastType.Info);
-
             PluginCore.StartScan();
         }
 
         private void OnStopScanButtonPress()
         {
-            var textToShow = $"Stop Scan Pressed";
-
-            CoreManager.Current.Actions.AddChatText(textToShow, 1);
-            UBService.Huds.Toaster.Add(textToShow, ToastType.Info);
-
             PluginCore.StopScan();
         }
 
         private void OnNextButtonPressed()
         {
-            var textToShow = $"Next Scan Pressed";
-
-            CoreManager.Current.Actions.AddChatText(textToShow, 1);
-            UBService.Huds.Toaster.Add(textToShow, ToastType.Info);
-
             PluginCore.IterateScan();
         }
 
         private void OnExportSaveButtonClicked()
         {
-            Utilities.Message("OnExportSaveButtonClicked");
             Export.DoExport(ExportPath);
         }
     }

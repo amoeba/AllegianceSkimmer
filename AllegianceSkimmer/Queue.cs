@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using Decal.Adapter;
-using UtilityBelt.Scripting.Actions;
-using static System.Net.Mime.MediaTypeNames;
+﻿using System.Collections.Generic;
 
 namespace AllegianceSkimmer
 {
-  
+    // Just in case
     public class Task
     {
     }
@@ -43,13 +35,11 @@ namespace AllegianceSkimmer
             if (task is InvokeChatTask)
             {
                 InvokeChatTask chatTask = (InvokeChatTask)task;
-
-                Utilities.Message("Invoking Task of InvokeChat type");
                 PluginCore.Game().Actions.InvokeChat(chatTask.Message);
             }
             else
             {
-                Utilities.Message("On OnTick, found Not implemented task type.");
+                Utilities.Message("On OnTick, found Not implemented task type. This is a bug.");
 
                 return;
             }
@@ -57,7 +47,6 @@ namespace AllegianceSkimmer
 
         public void Enqueue(Task task)
         {
-            Utilities.Message("Enqueing task...");
             tasks.Push(task);
         }
 

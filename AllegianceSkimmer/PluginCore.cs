@@ -19,33 +19,24 @@ namespace AllegianceSkimmer
     [FriendlyName("AllegianceSkimmer")]
     public class PluginCore : PluginBase
     {
-        private ExampleUI ui;
+        private PluginUI ui;
         private static Game _game;
         public static Scan currentScan;
         public static System.Windows.Forms.Timer globalTimer;
         public static Queue globalQueue;
 
-        /// <summary>
-        /// Assembly directory containing the plugin dll
-        /// </summary>
-
-
-        /// <summary>
-        /// Called when your plugin is first loaded.
-        /// </summary>
         protected override void Startup()
         {
             try
             {
-                // subscribe to CharacterFilter_LoginComplete event, make sure to unscribe later.
-                // note: if the plugin was reloaded while ingame, this event will never trigger on the newly reloaded instance.
+                // Globals
+                Globals.Init("AllegianceSkimmer");
+
+                // Events
                 CoreManager.Current.CharacterFilter.LoginComplete += CharacterFilter_LoginComplete;
-
-
-                // this adds text to the chatbox. it's output is local only, other players do not see this.
-                CoreManager.Current.Actions.AddChatText($"This is my new decal plugin. Startup was called. AllegianceSkimmer", 1);
-
-                ui = new ExampleUI();
+                
+                // UI
+                ui = new PluginUI();
 
                 // UB
                 _game = new Game();
@@ -54,13 +45,12 @@ namespace AllegianceSkimmer
                 // Timer
                 globalTimer = new System.Windows.Forms.Timer();
                 globalTimer.Tick += GlobalTimer_Tick;
-                globalTimer.Interval = 300;
+                globalTimer.Interval = 20;
                 globalTimer.Start();
 
                 // Queue
                 globalQueue = new Queue();
 
-                Globals.Init("AllegianceSkimmer");
             }
             catch (Exception ex)
             {
@@ -68,18 +58,10 @@ namespace AllegianceSkimmer
             }
         }
 
-        /// <summary>
-        /// Called when your plugin is unloaded. Either when logging out, closing the client, or hot reloading.
-        /// </summary>
         protected override void Shutdown()
         {
             try
             {
-                Globals.Destroy();
-                // make sure to unsubscribe from any events we were subscribed to. Not doing so
-                // can cause the old plugin to stay loaded between hot reloads.
-                CoreManager.Current.CharacterFilter.LoginComplete -= CharacterFilter_LoginComplete;
-
                 // Queue
                 globalQueue = null;
 
@@ -88,12 +70,19 @@ namespace AllegianceSkimmer
                 globalTimer.Dispose();
                 globalTimer = null;
 
-                // UB Shutdown
+                // UB
                 _game.Messages.Incoming.Allegiance_AllegianceInfoResponseEvent -= Incoming_Allegiance_AllegianceInfoResponseEvent;
                 _game = null;
 
-                // clean up our ui view
+                // UI
                 ui.Dispose();
+
+                // Events
+                CoreManager.Current.CharacterFilter.LoginComplete -= CharacterFilter_LoginComplete;
+
+                // Globals
+                Globals.Destroy();
+
             }
             catch (Exception ex)
             {
@@ -106,9 +95,6 @@ namespace AllegianceSkimmer
             Utilities.AssemblyDirectory = assemblyDirectory;
         }
 
-        /// <summary>
-        /// CharacterFilter_LoginComplete event handler.
-        /// </summary>
         private void CharacterFilter_LoginComplete(object sender, EventArgs e)
         {
             // it's generally a good idea to use try/catch blocks inside of decal event handlers.
@@ -138,19 +124,23 @@ namespace AllegianceSkimmer
 
             uint monarch_id = _game.Character.Allegiance.Monarch.Id;
             string monarch_name = _game.Character.Allegiance.Monarch.Name;
+            uint expected = _game.Character.Allegiance.TotalMembers;
 
-            Utilities.Message($"Starting scan for allegiance with monarch {monarch_id:X2} {monarch_name}.");
-            currentScan = new Scan(new ScanItem(monarch_id, monarch_name, /*is_root*/true));
+            currentScan = new Scan(new ScanItem(monarch_id, monarch_name, /*is_root*/true), expected);
             currentScan.Begin();
         }
 
         public static void StopScan()
         {
-            if (currentScan != null)
+            if (currentScan == null)
             {
-                currentScan.End();
-                currentScan = null;
+                Utilities.Message("Not currently scanning. Doing nothing.");
+                return;
             }
+
+
+            currentScan.End();
+            currentScan = null;
 
             if (globalQueue != null)
             {
@@ -170,15 +160,11 @@ namespace AllegianceSkimmer
             currentScan.Next();
         }
 
-        /// <summary>
-        /// Incoming_Allegiance_AllegianceInfoResponseEvent event handler.
-        /// </summary>
         private void Incoming_Allegiance_AllegianceInfoResponseEvent(object sender, Allegiance_AllegianceInfoResponseEvent_S2C_EventArgs e)
         {
             // If there's no current scan, ignore
             if (currentScan == null)
             {
-                Utilities.Message("Not handling AllegianceInfoResponseEvent because we're not currently scanning");
                 return;
             }
 

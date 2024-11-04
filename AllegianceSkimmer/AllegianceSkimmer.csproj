@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="PluginCore.cs" />
-    <None Include="ExampleUI.cs" />
+    <None Include="PluginUI.cs" />
     <Content Include="scripts\installer.nsi" />
     <Content Include="scripts\post-build.ps1" />
   </ItemGroup>

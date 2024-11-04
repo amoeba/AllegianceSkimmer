@@ -15,10 +15,6 @@ namespace AllegianceSkimmer
             Log(ex.ToString());
         }
 
-        /// <summary>
-        /// Log a string to log.txt in the same directory as the plugin.
-        /// </summary>
-        /// <param name="message"></param>
         internal static void Log(string message)
         {
             try
