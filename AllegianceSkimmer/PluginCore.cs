@@ -97,11 +97,9 @@ namespace AllegianceSkimmer
 
         private void CharacterFilter_LoginComplete(object sender, EventArgs e)
         {
-            // it's generally a good idea to use try/catch blocks inside of decal event handlers.
-            // throwing an uncaught exception inside one will generally hard crash the client.
             try
             {
-                CoreManager.Current.Actions.AddChatText($"This is my new decal plugin. CharacterFilter_LoginComplete", 1);
+                // TODO
             }
             catch (Exception ex)
             {
