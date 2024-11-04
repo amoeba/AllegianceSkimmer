@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using AcClient;
+
 using Decal.Adapter;
 using UtilityBelt.Common.Messages.Events;
-using UtilityBelt.Common.Messages.Types;
 using UtilityBelt.Scripting.Interop;
-using UtilityBelt.Service.Lib;
 
 namespace AllegianceSkimmer
 {
-    /// <summary>
-    /// This is the main plugin class. When your plugin is loaded, Startup() is called, and when it's unloaded Shutdown() is called.
-    /// </summary>
     [FriendlyName("AllegianceSkimmer")]
     public class PluginCore : PluginBase
     {
@@ -24,6 +14,11 @@ namespace AllegianceSkimmer
         public static Scan currentScan;
         public static System.Windows.Forms.Timer globalTimer;
         public static Queue globalQueue;
+
+        public static Game Game()
+        {
+            return _game;
+        }
 
         protected override void Startup()
         {
@@ -34,6 +29,7 @@ namespace AllegianceSkimmer
 
                 // Events
                 CoreManager.Current.CharacterFilter.LoginComplete += CharacterFilter_LoginComplete;
+                CoreManager.Current.ChatBoxMessage += Current_ChatBoxMessage;
                 
                 // UI
                 ui = new PluginUI();
@@ -41,7 +37,8 @@ namespace AllegianceSkimmer
                 // UB
                 _game = new Game();
                 _game.Messages.Incoming.Allegiance_AllegianceInfoResponseEvent += Incoming_Allegiance_AllegianceInfoResponseEvent;
-                
+
+
                 // Timer
                 globalTimer = new System.Windows.Forms.Timer();
                 globalTimer.Tick += GlobalTimer_Tick;
@@ -78,6 +75,7 @@ namespace AllegianceSkimmer
                 ui.Dispose();
 
                 // Events
+                CoreManager.Current.ChatBoxMessage -= Current_ChatBoxMessage;
                 CoreManager.Current.CharacterFilter.LoginComplete -= CharacterFilter_LoginComplete;
 
                 // Globals
@@ -107,9 +105,23 @@ namespace AllegianceSkimmer
             }
         }
 
-        public static Game Game()
+        private void Current_ChatBoxMessage(object sender, ChatTextInterceptEventArgs e)
         {
-            return _game;
+            if (currentScan != null && currentScan.IsActive)
+            {
+                e.Eat = true;
+            }
+        }
+
+        private void Incoming_Allegiance_AllegianceInfoResponseEvent(object sender, Allegiance_AllegianceInfoResponseEvent_S2C_EventArgs e)
+        {
+            // If there's no current scan, ignore
+            if (currentScan == null)
+            {
+                return;
+            }
+
+            currentScan.HandleInfo(e);
         }
 
         public static void StartScan()
@@ -136,7 +148,6 @@ namespace AllegianceSkimmer
                 return;
             }
 
-
             currentScan.End();
             currentScan = null;
 
@@ -156,18 +167,6 @@ namespace AllegianceSkimmer
             }
 
             currentScan.Next();
-        }
-
-        private void Incoming_Allegiance_AllegianceInfoResponseEvent(object sender, Allegiance_AllegianceInfoResponseEvent_S2C_EventArgs e)
-        {
-            // If there's no current scan, ignore
-            if (currentScan == null)
-            {
-                return;
-            }
-
-            currentScan.HandleInfo(e);
-
         }
 
         private void GlobalTimer_Tick(object sender, EventArgs e)
