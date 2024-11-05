@@ -54,7 +54,7 @@ namespace AllegianceSkimmer
         DateTime ended_at;
 
         public uint ExpectedSize { get => expected_size; }
-        public bool IsActive {  get => active; }
+        public bool IsActive { get => active; set => active = value; }
 
         public Scan(ScanItem _root, uint _expected_size)
         {
