@@ -109,7 +109,12 @@ namespace AllegianceSkimmer
 
         private void Current_ChatBoxMessage(object sender, ChatTextInterceptEventArgs e)
         {
-            if (currentScan != null && currentScan.IsActive)
+            if (currentScan == null || !currentScan.IsActive)
+            {
+                return;
+            }
+
+            if (e.Text.StartsWith("Allegiance information for") || e.Text.StartsWith("Note: An a") || e.Text.StartsWith("   "))
             {
                 e.Eat = true;
             }
