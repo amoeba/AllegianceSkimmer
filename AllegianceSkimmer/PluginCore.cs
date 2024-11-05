@@ -15,6 +15,8 @@ namespace AllegianceSkimmer
         public static System.Windows.Forms.Timer globalTimer;
         public static Queue globalQueue;
 
+        public static string Website { get => "https://github.com/amoeba/AllegianceSkimmer"; }
+
         public static Game Game()
         {
             return _game;
