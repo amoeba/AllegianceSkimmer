@@ -20,7 +20,13 @@ namespace AllegianceSkimmer
             hud.ShowInBar = true;
             // Temporary
             hud.Visible = true;
+            hud.OnPreRender += Hud_OnPreRender;
             hud.OnRender += Hud_OnRender;
+        }
+
+        private void Hud_OnPreRender(object sender, EventArgs e)
+        {
+            ImGui.SetNextWindowSize(new Vector2(300, 300), ImGuiCond.Always);
         }
 
         private void Hud_OnRender(object sender, EventArgs e)
