@@ -32,6 +32,7 @@ namespace AllegianceSkimmer
                 var jo = new JObject
                 {
                     ["name"] = value.Name,
+                    ["is_online"] = value.IsOnline,
                     ["children"] = JArray.FromObject(value.Children ?? new List<ScanItem>())
                 };
 

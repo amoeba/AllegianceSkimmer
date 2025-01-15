@@ -13,6 +13,7 @@ namespace AllegianceSkimmer
         private string name;
         private List<ScanItem> children;
         private bool is_root;
+        private bool is_online;
 
         public ScanItem() { }
         public ScanItem(uint _id, string _name)
@@ -23,6 +24,7 @@ namespace AllegianceSkimmer
             name = _name;
             children = new List<ScanItem>();
             is_root = false;
+            is_online = false;
         }
 
         public ScanItem(uint _id, string _name, bool _is_root)
@@ -33,6 +35,7 @@ namespace AllegianceSkimmer
             name = _name;
             children = new List<ScanItem>();
             is_root = _is_root;
+            is_online = false;
         }
 
         public uint ObjectId { get => id; }
@@ -41,7 +44,11 @@ namespace AllegianceSkimmer
         public bool Resolved { get { return resolved; } internal set { resolved = value; } }
         public bool InFlight { get { return inflight; } internal set { inflight = value; } }
         public bool IsRoot { get => is_root; }
-
+        public bool IsOnline
+        {
+            get => is_online;
+            set => is_online = value;
+        }
     }
 
     public class Scan
@@ -149,6 +156,7 @@ namespace AllegianceSkimmer
                 // Finally handle the new item to be scanned
                 string name = record.AllegianceData.Name;
                 var si = new ScanItem(record.AllegianceData.ObjectId, record.AllegianceData.Name);
+                si.IsOnline = record.AllegianceData.Bitfield.HasFlag(UtilityBelt.Common.Enums.AllegianceRecordFlags.LoggedIn);
 
                 // We add the new ScanItem to two places:
                 // 
