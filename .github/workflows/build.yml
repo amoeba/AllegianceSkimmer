@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore AllegianceSkimmer.sln
+
+      - name: Build (Debug)
+        run: msbuild AllegianceSkimmer.sln /p:Configuration=Debug /p:Platform="Any CPU"
+
+      - name: Test
+        run: dotnet test AllegianceSkimmer.Tests/AllegianceSkimmer.Tests.csproj --no-build -c Debug
