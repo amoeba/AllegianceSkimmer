@@ -6,7 +6,7 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <OutputPath>..\bin\</OutputPath>
     <PlatformTarget>x86</PlatformTarget>
-    <Version>1.0.0</Version>
+    <Version>0.1.0</Version>
     <LangVersion>12</LangVersion>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <ProjectGuid>1cdb3f80-dd13-4f81-bbd7-9b3344f64598</ProjectGuid>
@@ -40,7 +40,8 @@
       <ExcludeAssets>runtime; build;</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
-  <Target Name="MergeAssemblies" AfterTargets="Build" BeforeTargets="PostBuild" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="MergeAssemblies" AfterTargets="Build" BeforeTargets="PostBuild"
+    Condition="'$(Configuration)' == 'Release'">
     <ItemGroup>
       <ILRepackInputAssemblies Include="$(TargetPath)" />
       <ILRepackInputAssemblies Include="$(TargetDir)Newtonsoft.Json.dll" />
@@ -58,6 +59,7 @@
     <PropertyGroup>
       <_NuGetRoot>$(NuGetPackageRoot.TrimEnd('\'))</_NuGetRoot>
     </PropertyGroup>
-    <Exec Command="powershell -ExecutionPolicy RemoteSigned -NoProfile &quot;$(MSBuildProjectDirectory)\scripts\post-build.ps1&quot; -NuGetPackageRoot &quot;$(_NuGetRoot)&quot; -ProjectDir &quot;$(MSBuildProjectDirectory)&quot;" />
+    <Exec
+      Command="powershell -ExecutionPolicy RemoteSigned -NoProfile &quot;$(MSBuildProjectDirectory)\scripts\post-build.ps1&quot; -NuGetPackageRoot &quot;$(_NuGetRoot)&quot; -ProjectDir &quot;$(MSBuildProjectDirectory)&quot;" />
   </Target>
 </Project>
