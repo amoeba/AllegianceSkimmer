@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Override the ILRepack.Lib.MSBuild.Task built-in target so it does not
+       automatically merge all output assemblies (which would include
+       AllegianceSkimmer.Loader, used only for hot-reload during development).
+       The MergeAssemblies target in AllegianceSkimmer.csproj handles the
+       merge explicitly, merging only Newtonsoft.Json.dll in Release builds. -->
+  <Target Name="ILRepack" />
+</Project>
