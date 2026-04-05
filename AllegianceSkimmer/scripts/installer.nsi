@@ -145,7 +145,6 @@ Section "" CoreSection
     
     File "${BUILDPATH}\${ASSEMBLY}"
     File "${BUILDPATH}\${APPNAME}.pdb"
-    File "${BUILDPATH}\UtilityBelt.Service.Installer.exe"
 
 SectionEnd
 

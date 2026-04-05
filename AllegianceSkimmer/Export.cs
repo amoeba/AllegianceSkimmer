@@ -1,59 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 
 namespace AllegianceSkimmer
 {
     public static class Export
     {
-        public class ScanItemJsonConverter : JsonConverter<ScanItem>
+        private static string JsonString(string s)
         {
-            public override ScanItem ReadJson(JsonReader reader, Type objectType, ScanItem existingValue, bool hasExistingValue, JsonSerializer serializer)
+            if (s == null) return "null";
+            return "\"" + s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t") + "\"";
+        }
+
+        public static string Serialize(ScanItem item)
+        {
+            using (var sw = new StringWriter())
             {
-                // Create JObject from reader
-                JObject jo = JObject.Load(reader);
-
-                // Create new ScanItem
-                var scanItem = new ScanItem
-                {
-                    Name = jo["name"]?.ToString(),
-                    Children = jo["children"]?.ToObject<List<ScanItem>>()
-                };
-
-                return scanItem;
+                WriteItem(sw, item);
+                return sw.ToString();
             }
+        }
 
-            public override void WriteJson(JsonWriter writer, ScanItem value, JsonSerializer serializer)
+        private static void WriteItem(TextWriter writer, ScanItem item)
+        {
+            writer.Write("{\"name\":");
+            writer.Write(JsonString(item.Name));
+            writer.Write(",\"is_online\":");
+            writer.Write(item.IsOnline ? "true" : "false");
+            writer.Write(",\"children\":[");
+            if (item.Children != null)
             {
-                // Create new JObject with only the properties we want to serialize
-                var jo = new JObject
+                for (int i = 0; i < item.Children.Count; i++)
                 {
-                    ["name"] = value.Name,
-                    ["is_online"] = value.IsOnline,
-                    ["children"] = JArray.FromObject(value.Children ?? new List<ScanItem>())
-                };
-
-                if (value.Children != null && value.Children.Count > 0)
-                {
-                    // Create a new JArray for children
-                    var childrenArray = new JArray();
-                    foreach (var child in value.Children)
-                    {
-                        // Serialize each child using the same serializer to maintain consistency
-                        using (var childWriter = new JTokenWriter())
-                        {
-                            serializer.Serialize(childWriter, child);
-                            childrenArray.Add(childWriter.Token);
-                        }
-                    }
-                    jo["children"] = childrenArray;
+                    if (i > 0) writer.Write(",");
+                    WriteItem(writer, item.Children[i]);
                 }
-
-                jo.WriteTo(writer);
             }
+            writer.Write("]}");
         }
 
         public static void DoExport(string filename)
@@ -87,16 +69,10 @@ namespace AllegianceSkimmer
             {
                 using (StreamWriter writer = new StreamWriter(path, false))
                 {
-                    var settings = new JsonSerializerSettings
-                    {
-                        Converters = new List<JsonConverter> { new ScanItemJsonConverter() }
-                    };
-                    string json = JsonConvert.SerializeObject(root, settings);
-
-                    writer.Write(json);
+                    WriteItem(writer, root);
                 }
             }
-            catch (Exception ex) { 
+            catch (Exception ex) {
                 Logging.Log(ex);
             }
 
