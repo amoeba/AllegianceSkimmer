@@ -6,7 +6,7 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <OutputPath>..\bin\</OutputPath>
     <PlatformTarget>x86</PlatformTarget>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <LangVersion>12</LangVersion>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <ProjectGuid>1cdb3f80-dd13-4f81-bbd7-9b3344f64598</ProjectGuid>
