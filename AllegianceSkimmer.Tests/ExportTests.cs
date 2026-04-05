@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
@@ -9,18 +6,12 @@ namespace AllegianceSkimmer.Tests
     [TestFixture]
     public class ExportTests
     {
-        private static JsonSerializerSettings Settings() =>
-            new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> { new Export.ScanItemJsonConverter() }
-            };
-
         [Test]
         public void WriteJson_LeafNode_SerializesNameIsOnlineAndEmptyChildren()
         {
             var item = new ScanItem(1, "TestChar");
 
-            var obj = JObject.Parse(JsonConvert.SerializeObject(item, Settings()));
+            var obj = JObject.Parse(Export.Serialize(item));
 
             Assert.That((string)obj["name"], Is.EqualTo("TestChar"));
             Assert.That((bool)obj["is_online"], Is.False);
@@ -33,7 +24,7 @@ namespace AllegianceSkimmer.Tests
         {
             var item = new ScanItem(1, "TestChar") { IsOnline = true };
 
-            var obj = JObject.Parse(JsonConvert.SerializeObject(item, Settings()));
+            var obj = JObject.Parse(Export.Serialize(item));
 
             Assert.That((bool)obj["is_online"], Is.True);
         }
@@ -45,7 +36,7 @@ namespace AllegianceSkimmer.Tests
             parent.Children.Add(new ScanItem(2, "Child1"));
             parent.Children.Add(new ScanItem(3, "Child2"));
 
-            var obj = JObject.Parse(JsonConvert.SerializeObject(parent, Settings()));
+            var obj = JObject.Parse(Export.Serialize(parent));
             var children = (JArray)obj["children"];
 
             Assert.That(children.Count, Is.EqualTo(2));
@@ -58,7 +49,7 @@ namespace AllegianceSkimmer.Tests
         {
             var item = new ScanItem(); // default ctor leaves Children null
 
-            var obj = JObject.Parse(JsonConvert.SerializeObject(item, Settings()));
+            var obj = JObject.Parse(Export.Serialize(item));
 
             Assert.That(obj["children"].Type, Is.EqualTo(JTokenType.Array));
             Assert.That(((JArray)obj["children"]).Count, Is.EqualTo(0));
@@ -72,7 +63,7 @@ namespace AllegianceSkimmer.Tests
             child.Children.Add(new ScanItem(3, "Grandchild"));
             root.Children.Add(child);
 
-            var obj = JObject.Parse(JsonConvert.SerializeObject(root, Settings()));
+            var obj = JObject.Parse(Export.Serialize(root));
             var grandchild = obj["children"][0]["children"][0];
 
             Assert.That((string)grandchild["name"], Is.EqualTo("Grandchild"));

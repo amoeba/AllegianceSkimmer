@@ -27,7 +27,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -40,22 +39,7 @@
       <ExcludeAssets>runtime; build;</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
-  <Target Name="MergeAssemblies" AfterTargets="Build" BeforeTargets="PostBuild"
-    Condition="'$(Configuration)' == 'Release'">
-    <ItemGroup>
-      <ILRepackInputAssemblies Include="$(TargetPath)" />
-      <ILRepackInputAssemblies Include="$(TargetDir)Newtonsoft.Json.dll" />
-    </ItemGroup>
-    <ILRepack
-      Parallel="true"
-      Internalize="true"
-      InputAssemblies="@(ILRepackInputAssemblies)"
-      LibraryPath="$(TargetDir);$(MSBuildProjectDirectory)\..\deps"
-      OutputFile="$(TargetPath)"
-    />
-  </Target>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <_NuGetRoot>$(NuGetPackageRoot.TrimEnd('\'))</_NuGetRoot>
     </PropertyGroup>
