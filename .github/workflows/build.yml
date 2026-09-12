@@ -18,9 +18,10 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/.decal-msi/Decal.msi
-          # Pinned to the SHA-256 of the Decal.msi we build against. Bump when
-          # the URL above changes. See AllegianceSkimmer/scripts/acquire-decal-deps.ps1.
-          key: decal-msi-101365ba4378be20d9ab57ba9f1c1deda5f93bb1b7bdb511da836c9a69a31f26
+          # Key derives from the pinned MSI URL/hash in
+          # AllegianceSkimmer/scripts/decal-deps.json so the cache rotates
+          # automatically when the pin changes.
+          key: decal-msi-${{ hashFiles('AllegianceSkimmer/scripts/decal-deps.json') }}
 
       - name: Acquire Decal deps
         shell: pwsh

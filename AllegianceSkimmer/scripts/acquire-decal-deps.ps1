@@ -17,10 +17,12 @@
     Extraction uses "msiexec /a" on Windows and 7-Zip elsewhere.
 
 .PARAMETER MSIUrl
-    Where to download Decal.msi from. Defaults to the pinned 2983 release.
+    Where to download Decal.msi from. Defaults to the value pinned in
+    decal-deps.json (the 2983 release).
 
 .PARAMETER ExpectedSha256
-    Pinned SHA-256 of Decal.msi. Downloads failing this check abort the build.
+    Pinned SHA-256 of Decal.msi. Defaults to the value pinned in
+    decal-deps.json. Downloads failing this check abort the build.
 
 .PARAMETER MSIFile
     Optional path to cache Decal.msi at. When provided, the script uses it as
@@ -33,8 +35,8 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$MSIUrl = "https://www.decaldev.com/releases/2983/Decal.msi",
-    [string]$ExpectedSha256 = "101365BA4378BE20D9AB57BA9F1C1DEDA5F93BB1B7BDB511DA836C9A69A31F26",
+    [string]$MSIUrl,
+    [string]$ExpectedSha256,
     [string]$MSIFile,
     [string]$OutputDir
 )
@@ -46,6 +48,11 @@ if (-not $OutputDir) {
     $OutputDir = Join-Path $RepoRoot "deps"
 }
 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+
+# Single source of truth for the pinned MSI download.
+$config = Get-Content -Raw (Join-Path $PSScriptRoot "decal-deps.json") | ConvertFrom-Json
+if (-not $MSIUrl) { $MSIUrl = $config.msiUrl }
+if (-not $ExpectedSha256) { $ExpectedSha256 = $config.expectedSha256 }
 
 $IsWindowsHost = $null -ne $env:OS -and $env:OS -like "Windows*"
 
