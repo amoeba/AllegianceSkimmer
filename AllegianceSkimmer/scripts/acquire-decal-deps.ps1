@@ -67,6 +67,9 @@ if (-not $MSIFile) {
     $MSIFile = Join-Path $cacheRoot "Decal.msi"
 }
 
+# Normalize separators: msiexec fails on mixed \ and / from ${{ github.workspace }}.
+$MSIFile = [System.IO.Path]::GetFullPath($MSIFile)
+
 if (Test-Sha256 -Path $MSIFile -Expected $ExpectedSha256) {
     Write-Host "Using cached MSI: $MSIFile"
 }
