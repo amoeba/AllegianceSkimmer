@@ -9,6 +9,19 @@ AllegianceSkimmer requires `UtilityBelt.Service`. The installer will automatical
 
 See [Releases](https://github.com/amoeba/AllegianceSkimmer/releases) for a download link to the installer.
 
+## Building
+
+The Decal assemblies (`Decal.Adapter.dll`, `Decal.Interop.Core.dll`) are not committed
+to the repo. They are downloaded (and cached by SHA-256) from Decal's installer and
+extracted into `deps/` before the build — automatically in CI, or manually with:
+
+```
+pwsh AllegianceSkimmer/scripts/acquire-decal-deps.ps1
+```
+
+On macOS/Linux this needs [PowerShell](https://github.com/PowerShell/PowerShell) and
+[7-Zip](https://www.7-zip.org/) installed.
+
 ## Usage
 
 ## Start a Scan
