@@ -17,6 +17,19 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v3
 
+      - name: Cache Decal MSI
+        id: cache-decal-msi
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.decal-msi/Decal.msi
+          # Pinned to the SHA-256 of the Decal.msi we build against. Bump when
+          # the URL above changes. See AllegianceSkimmer/scripts/acquire-decal-deps.ps1.
+          key: decal-msi-101365ba4378be20d9ab57ba9f1c1deda5f93bb1b7bdb511da836c9a69a31f26
+
+      - name: Acquire Decal deps
+        shell: pwsh
+        run: ./AllegianceSkimmer/scripts/acquire-decal-deps.ps1 -MSIFile "${{ github.workspace }}/.decal-msi/Decal.msi"
+
       - name: Restore NuGet packages
         run: nuget restore AllegianceSkimmer.sln
 
