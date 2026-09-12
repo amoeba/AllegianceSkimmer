@@ -6,6 +6,8 @@ name: Decal MSI Contents
 
 on:
   workflow_dispatch:
+  push:
+  pull_request:
 
 jobs:
   inspect:
